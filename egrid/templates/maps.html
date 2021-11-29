@@ -1,10 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% block style %}
+  #map { height: 640px; }
+  .info {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  }
+  .info h4 {
+  margin: 0 0 5px;
+  color: #777;
+  }
+  .legend {
+  line-height: 18px;
+  color: #555;
+  }
+  .legend i {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.7;
+  }
+
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h3>Map data visualisation</h3>
+
+    <div id="map"></div>
+  </div>
+
+
+{% endblock %}
+
+{% block inline_javascript %}
+  <script>
+    var mapboxAccessToken = 'pk.eyJ1IjoiaGFraW0xM29yIiwiYSI6ImNrd2swOWxkdzFsaXcydm52M2V3aG9zdDcifQ.7MuLIvj937fBJ_D0b5Ne1g';
+    var map = L.map('map').setView([37.8, -96], 4);
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + mapboxAccessToken, {
+      id: 'mapbox/light-v9',
+
+      tileSize: 512,
+      zoomOffset: -1
+    }).addTo(map);
+
+    function getColor(d) {
+      return d > 8 ? '#800026' :
+        d > 6 ? '#BD0026' :
+          d > 4 ? '#E31A1C' :
+            d > 2 ? '#FC4E2A' :
+              d > 1 ? '#FD8D3C' :
+                d > 0.5 ? '#FEB24C' :
+                  d > 0.1 ? '#FED976' :
+                    '#FFEDA0';
+    }
+
+    function style(feature) {
+      return {
+        fillColor: getColor(feature.properties.percentage),
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7
+      };
+    }
+
+    function highlightFeature(e) {
+      var layer = e.target;
+
+      layer.setStyle({
+        weight: 5,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.7
+      });
+
+      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+      }
+
+      info.update(layer.feature.properties);
+    }
+
+    var geojson;
+
+    function resetHighlight(e) {
+      geojson.resetStyle(e.target);
+      info.update();
+    }
+
+    function zoomToFeature(e) {
+      console.log(map)
+      map.fitBounds(e.target.getBounds());
+      console.log(e.target.feature.properties.name)
+      $.ajax({
+        type: "get",
+        url: "/api/plants",
+        data: {
+          PSTATABB: e.target.feature.properties.name,
+          limit: 1000
+        },
+        success: function (res) {
+
+          for (let i = 0; i < res.results.length; i++) {
+            var circle = L.circle([res.results[i]['LAT'], res.results[i]['LON']], {
+              color: 'blue',
+              fillColor: '#00F',
+              fillOpacity: 0,
+              radius: 10000
+            }).addTo(map);
+            circle.bindPopup("<b>"+res.results[i]['PNAME']+" </b> ("+res.results[i]['PLNGENAN']+"Mwh)<br>");
+
+
+          }
+        }
+      });
+
+    }
+
+    function onEachFeature(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+      });
+    }
+
+    geojson = L.geoJson({{geodata | safe }}, {
+      style: style,
+      onEachFeature: onEachFeature
+    }).addTo(map);
+
+    var info = L.control();
+
+    info.onAdd = function (map) {
+      this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+      this.update();
+      return this._div;
+    };
+
+    // method that we will use to update the control based on feature properties passed
+    info.update = function (props) {
+      this._div.innerHTML = '<h4>Net generation</h4>' + (props ?
+        '<b>Value:</b><br />' + props.generation + '(Mwh)<br>' +
+        '<b>Percentage:</b><br />' + props.percentage + '%<br>'
+        : 'Hover over a state');
+    };
+
+    info.addTo(map);
+
+
+    var legend = L.control({position: 'bottomright'});
+
+    legend.onAdd = function (map) {
+
+      var div = L.DomUtil.create('div', 'info legend'),
+        grades = [0., 0.5, 1, 2, 4, 6, 8, 10],
+        labels = [],
+        from, to;
+
+      for (var i = 0; i < grades.length; i++) {
+        from = grades[i];
+        to = grades[i + 1];
+
+        labels.push(
+          '<i style="background:' + getColor(from + 1) + '"></i> ' +
+          from + (to ? '&ndash;' + to : '+'));
+      }
+
+      div.innerHTML = labels.join('<br>');
+      return div;
+    };
+
+    legend.addTo(map);
+
+  </script>
+{% endblock %}

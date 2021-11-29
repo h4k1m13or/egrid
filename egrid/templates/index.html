@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="container my-2">
+    <h3 class="text-primary">PLANTS:</h3>
+    <table id="data" class="table table-bordered" style="width:100%">
+      <thead>
+      <tr>
+        <th>SEQPLT19</th>
+        <th>Plant Name</th>
+        <th>Plant state</th>
+        <th>Total generation (MWh)</th>
+      </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}
+
+{% block inline_javascript %}
+  <script>
+    $(document).ready(function () {
+      var table = $('#data').DataTable(
+        {
+          "order": [[3, "desc"]],
+          "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]]
+        }
+      );
+      table.on('length.dt', function (e, settings, len) {
+        console.log('New page length: ' + len);
+      });
+
+      $.ajax({
+        type: "get",
+        url: "/api/plants",
+        success: function (res) {
+          for (let i = 0; i < res.results.length; i++) {
+
+            table.row.add([
+              res.results[i]['SEQPLT19'],
+              res.results[i]['PNAME'],
+              res.results[i]['PSTATABB'],
+              res.results[i]['PLNGENAN'],
+            ]).draw(false);
+          }
+        }
+      });
+
+    });
+
+  </script>
+{% endblock %}
