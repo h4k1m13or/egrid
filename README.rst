@@ -62,9 +62,7 @@ Basic Commands
 Populate the database with egrid dataset 
 ^^^^^^^^^^^^^^^^^^^^^
 
-* after setting up dev environnement, you will need to migrate and populate the database, use this commands
-
-* To create an **superuser account**, use this command::
+* after setting up dev environnement, you will need to migrate and populate the database, use this commands::
 
     $ python manage.py migrate
     $ python manage.py populate_db
