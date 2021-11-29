@@ -24,23 +24,23 @@ API endpoints
 PLANTS
 ^^^^^^
 * list all plants 
-
-  ``` 
+::
+   
   GET /api/plants/ 
-  ```
+  
  
 **Parameters**
 
-| parameter | Description |
-| --- | --- |
-| `PSTATABB` | State code |
-| `limit` | limit items |
+``PSTATABB: state code``
+
+``limit: number or results limit`` 
+
 
 * get plant details 
-
-  ``` 
-  GET /api/plants/{id} 
-  ```
+::
+ 
+ GET /api/plants/{id} 
+ 
 
 STATES
 ^^^^^^
@@ -50,10 +50,9 @@ STATES
     /api/states/
 
 * get state details 
+::
 
-  ``` 
-  GET /api/state/{id} 
-  ```
+    GET /api/state/{id}  
 
 
 
