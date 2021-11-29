@@ -31,10 +31,10 @@ PLANTS
  
 **Parameters**
 
-|    parameter    | Description   |
-| --------------  | ------------- |
-|   `PSTATABB`    | State code    |
-|   `limit`       | limit items   |
+| parameter | Description |
+| --- | --- |
+| `PSTATABB` | State code |
+| `limit` | limit items |
 
 * get plant details 
 
