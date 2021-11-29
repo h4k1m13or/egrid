@@ -19,6 +19,44 @@ Moved to settings_.
 
 .. _settings: http://cookiecutter-django.readthedocs.io/en/latest/settings.html
 
+API endpoints
+--------------
+PLANTS
+^^^^^^
+* list all plants 
+
+  ``` 
+  GET /api/plants/ 
+  ```
+ 
+**Parameters**
+
+|    parameter    | Description   |
+| --------------  | ------------- |
+|   `PSTATABB`    | State code    |
+|   `limit`       | limit items   |
+
+* get plant details 
+
+  ``` 
+  GET /api/plants/{id} 
+  ```
+
+STATES
+^^^^^^
+* list all states 
+::
+
+    /api/states/
+
+* get state details 
+
+  ``` 
+  GET /api/state/{id} 
+  ```
+
+
+
 Basic Commands
 --------------
 
@@ -31,8 +69,6 @@ Populate the database with egrid dataset
 
     $ python manage.py migrate
     $ python manage.py populate_db
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
 
 Type checks
 ^^^^^^^^^^^
