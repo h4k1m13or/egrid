@@ -13,7 +13,3 @@ class ApiConfig(AppConfig):
 
     datastate = data = pd.read_excel(os.path.join(ROOT_DIR, "data/egrid.xlsx"), sheet_name="ST19",
                              header=1)
-
-
-
-
